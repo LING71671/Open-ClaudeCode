@@ -1,0 +1,87 @@
+{
+  "compilerOptions": {
+    /* Base Options */
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023"],
+    
+    /* Output */
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "importHelpers": false,
+    "noEmit": true,
+    
+    /* Strictness - Relaxed for source map recovery */
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitOverride": false,
+    "forceConsistentCasingInFileNames": false,
+    
+    /* Module Resolution */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": false,
+    "moduleSuffixes": [".js", ".ts", ".tsx", ""],
+    
+    /* JSX - React 19 */
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    
+    /* Paths & BaseUrl */
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    },
+    
+    /* Type Roots */
+    "typeRoots": ["./node_modules/@types", "./node_modules/bun-types"],
+    "types": ["node"],
+    
+    /* Advanced */
+    "skipLibCheck": true,
+    "preserveConstEnums": true,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+    "useUnknownInCatchVariables": false,
+    
+    /* Performance */
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
+    
+    /* Custom - Bun compatibility */
+    "moduleDetection": "force"
+  },
+  
+  /* Include/Exclude */
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "package",
+    "plugins",
+    "examples",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    ".sisyphus"
+  ]
+}

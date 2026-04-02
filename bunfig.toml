@@ -1,0 +1,7 @@
+[install]
+# Use exact versions from bun.lock when available
+optional = true
+
+[build]
+# Default build target
+target = "node"
