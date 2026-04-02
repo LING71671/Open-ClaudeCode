@@ -423,6 +423,37 @@ A: 可以！但建议在你的项目目录下运行，这样 Claude 可以访问
 ### Q: 和 npm 安装的区别？
 A: 这个仓库提供的是从 npm 包恢复的完整源码，适合学习研究。功能上和 npm 安装的版本一致。
 
+### Q: 支持 OpenAI 格式的 API 吗？
+A: Claude Code 原生使用 Anthropic API 格式。如果你需要使用 OpenAI SDK 格式调用，可以使用 **[Universal-AI-Protocol-Bridge](https://github.com/LING71671/Universal-AI-Protocol-Bridge)** 进行协议转换：
+
+**功能特性：**
+- 🔄 **协议转换** - 将 OpenAI SDK 格式转换为 Anthropic/Claude API 格式
+- 🌐 **多协议支持** - OpenAI、Anthropic、Google Gemini、AWS Bedrock、Azure、Ollama 等
+- ⚡ **流式传输优化** - 完整支持 SSE/NDJSON 流式响应
+- 🔐 **安全加密** - AES-GCM 加密保护 API Key
+- ☁️ **Cloudflare Workers** - 边缘部署，全球低延迟
+
+**使用方法：**
+1. 访问 [在线测试地址](https://apibridge.071.cc.cd/) 或自行部署
+2. 选择目标协议（如 Anthropic）并填入 API Key
+3. 生成代理 URL，将你的 OpenAI SDK `baseURL` 指向该地址即可
+
+```javascript
+// 示例：使用 OpenAI SDK 调用 Claude
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: 'https://your-bridge-url/proxy/{token}/v1',
+  apiKey: 'any-key'  // 实际 Key 已加密在 token 中
+});
+
+// 现在可以用 OpenAI 格式调用 Claude 了！
+const response = await client.chat.completions.create({
+  model: 'claude-3-5-sonnet-latest',
+  messages: [{ role: 'user', content: 'Hello!' }]
+});
+```
+
 ---
 
 ## 📚 学习源码
