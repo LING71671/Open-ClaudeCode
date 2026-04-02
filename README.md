@@ -88,7 +88,7 @@ Open-ClaudeCode/
 - **Node.js 18+** ([下载](https://nodejs.org/))
 - **API 密钥**（任选一种）：
   - 🔵 **Anthropic 官方 API** — 在 [console.anthropic.com](https://console.anthropic.com/) 注册获取 API Key
-  - 🟢 **第三方代理** — 国内用户推荐，获取代理地址和 API Key（如 `ai.ltcraft.cn` 等）
+  - 🟢 **第三方代理** — 国内用户推荐，获取代理地址和 API Key
   - 🔴 **Claude 订阅账号** — 运行后通过 OAuth 登录（需科学上网）
 
 ### 第一步：克隆并运行
