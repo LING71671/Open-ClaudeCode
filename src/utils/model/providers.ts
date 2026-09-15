@@ -19,53 +19,12 @@ export const MINIMAX_MODELS = [
     modelId: 'MiniMax-M3',
     contextWindow: 1_000_000,
     pricingUsdPerMillionTokens: {
-      input: 0.3,
-      output: 1.2,
-      cacheRead: 0.06,
+      input: 0.6,
+      output: 2.4,
+      cacheRead: 0.12,
       cacheWrite: null,
     },
-    pricingTiersUsdPerMillionTokens: [
-      {
-        serviceTier: 'standard',
-        maxInputTokens: 512_000,
-        pricing: {
-          input: 0.3,
-          output: 1.2,
-          cacheRead: 0.06,
-          cacheWrite: null,
-        },
-      },
-      {
-        serviceTier: 'standard',
-        maxInputTokens: null,
-        pricing: {
-          input: 0.6,
-          output: 2.4,
-          cacheRead: 0.12,
-          cacheWrite: null,
-        },
-      },
-      {
-        serviceTier: 'priority',
-        maxInputTokens: 512_000,
-        pricing: {
-          input: 0.45,
-          output: 1.8,
-          cacheRead: 0.09,
-          cacheWrite: null,
-        },
-      },
-      {
-        serviceTier: 'priority',
-        maxInputTokens: null,
-        pricing: {
-          input: 0.9,
-          output: 3.6,
-          cacheRead: 0.18,
-          cacheWrite: null,
-        },
-      },
-    ],
+    pricingTiersUsdPerMillionTokens: [],
     inputModalities: ['text', 'image', 'video'],
     thinking: ['adaptive', 'disabled'],
     defaultThinking: 'disabled',
