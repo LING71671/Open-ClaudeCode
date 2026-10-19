@@ -3,7 +3,7 @@ import { isUltrathinkEnabled } from './thinking.js'
 import { getInitialSettings } from './settings/settings.js'
 import { isProSubscriber, isMaxSubscriber, isTeamSubscriber } from './auth.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
-import { getAPIProvider } from './model/providers.js'
+import { getAPIProvider, getMiniMaxModel } from './model/providers.js'
 import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
 import { isEnvTruthy } from './envUtils.js'
 import type { EffortLevel } from 'src/entrypoints/sdk/runtimeTypes.js'
@@ -21,6 +21,9 @@ export type EffortValue = EffortLevel | number
 
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports the effort parameter.
 export function modelSupportsEffort(model: string): boolean {
+  const miniMaxModel = getMiniMaxModel(model)
+  if (miniMaxModel) return miniMaxModel.reasoningEfforts.length > 0
+
   const m = model.toLowerCase()
   if (isEnvTruthy(process.env.CLAUDE_CODE_ALWAYS_ENABLE_EFFORT)) {
     return true
@@ -51,6 +54,9 @@ export function modelSupportsEffort(model: string): boolean {
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports 'max' effort.
 // Per API docs, 'max' is Opus 4.6 only for public models — other models return an error.
 export function modelSupportsMaxEffort(model: string): boolean {
+  const miniMaxModel = getMiniMaxModel(model)
+  if (miniMaxModel) return miniMaxModel.defaultEffort === 'max'
+
   const supported3P = get3PModelCapabilityOverride(model, 'max_effort')
   if (supported3P !== undefined) {
     return supported3P
@@ -279,6 +285,9 @@ export function getOpusDefaultEffortConfig(): OpusDefaultEffortConfig {
 export function getDefaultEffortForModel(
   model: string,
 ): EffortValue | undefined {
+  const miniMaxModel = getMiniMaxModel(model)
+  if (miniMaxModel) return miniMaxModel.defaultEffort
+
   if (process.env.USER_TYPE === 'ant') {
     const config = getAntModelOverrideConfig()
     const isDefaultModel =

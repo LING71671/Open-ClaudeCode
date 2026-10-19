@@ -16,32 +16,62 @@ type MiniMaxPricingTier = {
 
 export const MINIMAX_MODELS = [
   {
-    modelId: 'MiniMax-M3',
+    modelId: 'MiniMax-M3.1-Flash',
     contextWindow: 1_000_000,
     pricingUsdPerMillionTokens: {
-      input: 0.6,
-      output: 2.4,
-      cacheRead: 0.12,
+      input: 0.15,
+      output: 0.6,
+      cacheRead: 0.015,
       cacheWrite: null,
     },
     pricingTiersUsdPerMillionTokens: [],
     inputModalities: ['text', 'image', 'video'],
-    thinking: ['adaptive', 'disabled'],
-    defaultThinking: 'disabled',
+    thinking: ['adaptive'],
+    defaultThinking: 'adaptive',
+    alwaysUsesThinking: true,
+    reasoningEfforts: ['low', 'medium', 'high', 'xhigh', 'max'],
+    defaultEffort: 'max',
+    supportsServiceTier: false,
   },
   {
-    modelId: 'MiniMax-M2.7',
-    contextWindow: 204_800,
+    modelId: 'MiniMax-M3',
+    contextWindow: 1_000_000,
     pricingUsdPerMillionTokens: {
       input: 0.3,
       output: 1.2,
       cacheRead: 0.06,
-      cacheWrite: 0.375,
+      cacheWrite: null,
     },
-    pricingTiersUsdPerMillionTokens: [],
-    inputModalities: ['text'],
-    thinking: ['always_on'],
-    defaultThinking: 'always_on',
+    // Preserve the existing 512,000-token interpretation of the published 512k tier.
+    pricingTiersUsdPerMillionTokens: [
+      {
+        serviceTier: 'standard',
+        maxInputTokens: 512_000,
+        pricing: { input: 0.3, output: 1.2, cacheRead: 0.06, cacheWrite: null },
+      },
+      {
+        serviceTier: 'standard',
+        maxInputTokens: null,
+        pricing: { input: 0.6, output: 2.4, cacheRead: 0.12, cacheWrite: null },
+      },
+      {
+        serviceTier: 'priority',
+        maxInputTokens: 512_000,
+        pricing: { input: 0.45, output: 1.8, cacheRead: 0.09, cacheWrite: null },
+      },
+      {
+        serviceTier: 'priority',
+        maxInputTokens: null,
+        pricing: { input: 0.9, output: 3.6, cacheRead: 0.18, cacheWrite: null },
+      },
+    ],
+    inputModalities: ['text', 'image', 'video'],
+    thinking: ['adaptive', 'disabled'],
+    defaultThinking: 'disabled',
+    alwaysUsesThinking: false,
+    reasoningEfforts: [],
+    defaultEffort: undefined,
+    supportsServiceTier: true,
   },
 ] as const
 
@@ -99,6 +129,46 @@ export function getMiniMaxPricing(
   )
 
   return pricingTier?.pricing ?? model.pricingUsdPerMillionTokens
+}
+
+/** Apply MiniMax's Messages contract after merging custom request parameters. */
+export function configureMiniMaxRequest(
+  modelId: string,
+  params: Record<string, unknown>,
+  effort: unknown,
+): void {
+  const model = getMiniMaxModel(modelId)
+  if (!model) return
+
+  const thinking = params.thinking as { type?: string } | null | undefined
+  params.thinking = {
+    type:
+      model.alwaysUsesThinking || (thinking != null && thinking.type !== 'disabled')
+        ? 'adaptive'
+        : 'disabled',
+  }
+
+  const outputConfig = {
+    ...((params.output_config as Record<string, unknown>) ?? {}),
+  }
+  if (model.reasoningEfforts.length > 0) {
+    const requestedEffort = outputConfig.effort ?? effort ?? model.defaultEffort
+    if (!(model.reasoningEfforts as readonly unknown[]).includes(requestedEffort)) {
+      throw new Error(
+        `Unsupported effort for ${model.modelId}: ${String(requestedEffort)}`,
+      )
+    }
+    outputConfig.effort = requestedEffort
+  } else {
+    // MiniMax-M3 ignores effort; do not advertise a setting that has no effect.
+    delete outputConfig.effort
+  }
+  if (Object.keys(outputConfig).length > 0) {
+    params.output_config = outputConfig
+  } else {
+    delete params.output_config
+  }
+  if (!model.supportsServiceTier) delete params.service_tier
 }
 
 export type APIProvider =
