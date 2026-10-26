@@ -21,7 +21,9 @@ import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
 import { randomUUID } from 'crypto'
 import {
+  configureMiniMaxRequest,
   getAPIProvider,
+  getMiniMaxModel,
   isFirstPartyAnthropicBaseUrl,
 } from 'src/utils/model/providers.js'
 import {
@@ -445,6 +447,9 @@ function configureEffortParams(
   betas: string[],
   model: string,
 ): void {
+  // MiniMax effort is validated after custom output_config parameters are merged.
+  if (getMiniMaxModel(model)) return
+
   if (!modelSupportsEffort(model) || 'effort' in outputConfig) {
     return
   }
@@ -1703,7 +1708,7 @@ async function* queryModel(
 
     lastRequestBetas = betasParams
 
-    return {
+    const params = {
       model: normalizeModelStringForAPI(options.model),
       messages: addCacheBreakpoints(
         messagesForAPI,
@@ -1733,6 +1738,8 @@ async function* queryModel(
       }),
       ...(speed !== undefined && { speed }),
     }
+    configureMiniMaxRequest(options.model, params, effort)
+    return params
   }
 
   // Compute log scalars synchronously so the fire-and-forget .then() closure

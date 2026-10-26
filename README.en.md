@@ -215,7 +215,7 @@ node package/cli.js -r <session-id>
 
 ### Configure MiniMax
 
-MiniMax can be selected directly through the built-in provider registry. The default region is `global_en`; use `cn_zh` for the China endpoint.
+MiniMax can be selected directly through the built-in provider registry. The default model is `MiniMax-M3.1-Flash`. The default region is `global_en`; use `cn_zh` for the China endpoint.
 
 ```json
 {
@@ -230,9 +230,25 @@ MiniMax can be selected directly through the built-in provider registry. The def
 Run either registered model explicitly when needed:
 
 ```bash
+node package/cli.js --settings settings.json --model MiniMax-M3.1-Flash
 node package/cli.js --settings settings.json --model MiniMax-M3
-node package/cli.js --settings settings.json --model MiniMax-M2.7
 ```
+
+Both models have a 1,000,000-token context window and accept text, image, and video input. MiniMax-M3.1-Flash always uses adaptive thinking; disabling it is not supported. Its `output_config.effort` accepts `low`, `medium`, `high`, `xhigh`, and `max` (default). For example, select `xhigh` with `CLAUDE_CODE_EXTRA_BODY='{"output_config":{"effort":"xhigh"}}'`. `none` is invalid. Flash does not support `service_tier`, so this client omits that field for Flash requests.
+
+MiniMax-M3 supports adaptive or disabled thinking, defaults to disabled for this Messages client, and ignores effort. Its OpenAI-compatible API defaults to adaptive thinking; that API uses `reasoning_effort` for Flash instead of `output_config.effort`.
+
+Prices below are USD per million tokens (input / output / cache read); cache-write prices are unknown:
+
+| Model | Standard pricing |
+| --- | --- |
+| MiniMax-M3.1-Flash | $0.15 / $0.60 / $0.015 |
+| MiniMax-M3, request input ≤512k | $0.30 / $1.20 / $0.06 |
+| MiniMax-M3, request input >512k | $0.60 / $2.40 / $0.12 |
+
+MiniMax-M3 Priority costs 1.5× the Standard rates. The estimator retains its existing 512,000-token boundary; the official pricing page publishes `512k` without an integer expansion. No model-specific output limit is assumed.
+
+Sources: [models](https://platform.minimax.io/docs/guides/models-intro.md), [pricing](https://platform.minimax.io/docs/pricing/overview.md), [Messages API](https://platform.minimax.io/docs/api-reference/text-chat-anthropic.md), [OpenAI-compatible API](https://platform.minimax.io/docs/api-reference/text-chat-openai.md).
 
 | Region | Anthropic-compatible base URL | OpenAI-compatible base URL | Documentation |
 | --- | --- | --- | --- |

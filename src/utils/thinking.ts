@@ -114,7 +114,7 @@ export function modelSupportsThinking(model: string): boolean {
 }
 
 export function modelAlwaysUsesThinking(model: string): boolean {
-  return getMiniMaxModel(model)?.defaultThinking === 'always_on'
+  return getMiniMaxModel(model)?.alwaysUsesThinking ?? false
 }
 
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports adaptive thinking.
@@ -156,6 +156,8 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
 }
 
 export function shouldEnableThinkingByDefault(): boolean {
+  if (modelAlwaysUsesThinking(getMainLoopModel())) return true
+
   if (process.env.MAX_THINKING_TOKENS) {
     return parseInt(process.env.MAX_THINKING_TOKENS, 10) > 0
   }
